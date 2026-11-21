@@ -1,0 +1,313 @@
+# Preliminary analysis {.unnumbered}
+
+
+
+# Data pre-processing
+
+## Package
+
+```{r}
+required <- c("readr",
+              "tidyverse",
+              "magrittr",
+              "survival",
+              "survminer",
+              "skimr",
+              "msigdbr",
+              "purrr",
+              "factoextra",
+              "survival",
+              "ggsurvfit",
+              "ggplot2",
+              "gtsummary")
+```
+
+Installing those that are not installed yet:
+
+```{r}
+to_install <- required[!required %in% installed.packages()[, "Package"]]
+if (length(to_install))
+  install.packages(to_install)
+```
+
+Loading the packages for interactive use:
+
+```{r}
+invisible(sapply(required, library, character.only = TRUE))
+```
+
+## Data
+
+```{r}
+df <- read_csv("data/METABRIC_RNA_Mutation.csv")
+```
+
+```{css, echo = FALSE}
+.output {
+max-height: 400px;
+overflow-y: scroll;
+}
+```
+
+Extract clinical and expression columns
+
+```{r}
+library(dplyr)
+library(stringr)
+
+# Split the column names into the 3 types (same logic as your Python code)
+clinical_cols <- names(df)[1:31]
+
+mutation_cols <- names(df)[str_detect(tolower(names(df)), "_mut$")]
+
+expression_cols <- setdiff(names(df)[32:ncol(df)], mutation_cols)
+
+# Select clinical + gene expression only (drops the mutation columns)
+df_ce <- df |>
+  select(all_of(c(clinical_cols, expression_cols)))
+
+paste("clinical variables:", length(clinical_cols))
+paste("gene expression variables:", length(expression_cols))
+```
+
+### Clinical variables
+
+```{r}
+#| class: output
+df |> 
+  select(clinical_cols) |> 
+  skim()
+```
+
+### Gene expression variables
+
+```{r}
+df |>
+  select(all_of(expression_cols)) |>
+  select(1:10) |>
+  skim()
+```
+ 
+## Biological pathway selection
+
+4 biological pathways:
+
+  - Estrogen / hormone signaling
+  
+  - PI3K–AKT–mTOR signaling
+  
+  - Cell cycle / proliferation
+  
+  - DNA repair
+
+```{r}
+#| code-fold: show
+
+hallmark <- msigdbr(species = "Homo sapiens", collection = "H")
+
+pathway_map <- tribble(
+  ~gs_name,                           ~pathway,
+  "HALLMARK_ESTROGEN_RESPONSE_EARLY", "Estrogen / hormone signaling",
+  "HALLMARK_ESTROGEN_RESPONSE_LATE",  "Estrogen / hormone signaling",
+  "HALLMARK_PI3K_AKT_MTOR_SIGNALING", "PI3K-AKT-mTOR signaling",
+  "HALLMARK_E2F_TARGETS",             "Cell cycle / proliferation",
+  "HALLMARK_G2M_CHECKPOINT",          "Cell cycle / proliferation",
+  "HALLMARK_DNA_REPAIR",              "DNA repair"
+)
+```
+
+Summary how many genes per pathway are available
+
+```{r}
+pathway_genes <- hallmark |>
+  inner_join(pathway_map, by = "gs_name") |>
+  distinct(pathway, gene_symbol) |>
+  mutate(gene_lower = tolower(gene_symbol))   # your columns are lowercase (e.g. brca1)
+
+
+# Use the FULL data frame, not the one trimmed with select(1:31)
+data_genes <- tolower(names(df))
+
+pathway_genes <- pathway_genes |>
+  mutate(in_data = gene_lower %in% data_genes)
+
+# Summary: how many genes per pathway are available
+pathway_genes |>
+  group_by(pathway) |>
+  summarise(
+    total_genes = n(),
+    genes_available   = sum(in_data),
+    percentage         = round(100 * genes_available / total_genes, 1)
+  )
+```
+
+I selected Estrogen / hormone signaling, PI3K–AKT–mTOR signaling, Cell cycle / proliferation because they have many available genes
+
+```{r}
+pathway_genes |>
+  filter(in_data) |>
+  group_by(pathway) |>
+  summarise(genes = paste(gene_symbol, collapse = ", "))
+```
+
+## Pathway scoring
+
+Standardize expression of each genes and calculate pathway score as below:
+
+$$
+S_{i,p} = \frac{1}{|G_p|} \sum_{g \in G_p} Z_{ig}
+$$
+
+where:
+
+- $i$: patient
+- $p$: pathway
+- $G_p$: genes belonging to pathway $p$ and present in METABRIC
+- $Z_{ig}$: standardized expression of gene $g$ in patient $i$
+
+```{r}
+#| fig-width: 13
+#| fig-height: 6
+
+# 1. Map each available gene to its actual column name in the data
+col_lookup <- tibble(col = names(df), gene_lower = tolower(names(df)))
+
+pathway_cols <- pathway_genes |>
+  filter(in_data) |>
+  inner_join(col_lookup, by = "gene_lower")   # adds the `col` column
+
+# 2. Z-score each gene column (mean 0, SD 1 across patients)
+gene_cols <- unique(pathway_cols$col)
+
+z_mat <- df |>
+  select(all_of(gene_cols)) |>
+  mutate(across(everything(), ~ as.numeric(scale(.x))))
+
+# 3. Pathway score = mean z-score of the genes in G_p, per patient
+pathway_scores <- pathway_cols |>
+  split(~pathway) |>
+  map(\(x) rowMeans(z_mat[, x$col, drop = FALSE], na.rm = TRUE)) |>
+  as_tibble() |>
+  rename(
+    score_hormone    = `Estrogen / hormone signaling`,
+    score_pi3k_akt   = `PI3K-AKT-mTOR signaling`,
+    score_cell_cycle = `Cell cycle / proliferation`,
+    score_dna_repair = `DNA repair`
+  )
+
+df_full <- bind_cols(df, pathway_scores) |> 
+  select(-c(score_dna_repair))
+
+df_full |>
+  select(patient_id, starts_with("score_")) |> 
+  head()
+```
+
+## Clustering algorithm
+
+I used k-mean clustering algorithm to cluster 2 subgroups based on 3 pathway score
+
+```{r}
+# 1. Prepare the score matrix (complete cases only, rescaled so all 4 scores have equal weight)
+score_df <- df_full |>
+  mutate(patient_row = row_number()) |>
+  select(patient_row, starts_with("score_")) |>
+  drop_na()
+
+score_mat <- score_df |>
+  select(starts_with("score_")) |>
+  scale()
+
+# 2. Run k-means for k = 2 and k = 3
+set.seed(123)
+km2 <- kmeans(score_mat, centers = 2, nstart = 50)
+
+# 3. Attach cluster labels back to the data
+score_df <- score_df |>
+  mutate(cluster_k2 = factor(km2$cluster))
+
+df_clust <- df_full |>
+  mutate(patient_row = row_number()) |>
+  left_join(score_df |> select(patient_row, cluster_k2), by = "patient_row")
+
+# Visual profile
+df_clust |>
+  filter(!is.na(cluster_k2)) |>
+  select(cluster_k2, starts_with("score_")) |>
+  pivot_longer(-cluster_k2, names_to = "pathway", values_to = "score") |>
+  ggplot(aes(x = cluster_k2, y = score, fill = cluster_k2)) +
+  geom_boxplot() +
+  facet_wrap(~pathway) +
+  theme_bw() +
+  theme(legend.position = "none")
+
+```
+
+
+::: {.callout-note}
+We clustered 2 groups:
+
+  - Group 1: Lower cell cycle, higher hormone signaling, lower PI3K-AKT-mTOR signaling pathway score
+  
+  - Group 2: Higher cell cycle, lower hormone signaling, higher PI3K-AKT-mTOR signaling pathway score
+
+:::
+
+## KM-curve
+
+```{r}
+df_clust %<>%
+  mutate(surv = case_when(death_from_cancer == "Living" ~ 0, .default = 1))
+
+survfit2(Surv(overall_survival_months, surv) ~ cluster_k2, data = df_clust) |>
+  ggsurvfit() +
+  add_confidence_interval() +
+  labs(x = "Time (months)", y = "Overall survival probability",
+       color = "Cluster", fill = "Cluster") +
+  scale_ggsurvfit() +
+  theme_minimal() +
+  theme(legend.position = "bottom")
+```
+
+# Exploratory analysis
+
+```{r}
+df_clust |>
+  mutate(npi_cat = cut(
+    nottingham_prognostic_index,
+    breaks = c(-Inf, 2.4, 3.4, 4.4, 5.4, 6.4, Inf),
+    labels = c("Excellent", "Good", "Moderate 1", "Moderate 2", "Poor", "Very poor"),
+    right = TRUE
+  )) |>
+  tbl_summary(
+    by = cluster_k2,
+    include = c(
+      age_at_diagnosis,
+      er_status,
+      her2_status,
+      pr_status,
+      chemotherapy,
+      hormone_therapy,
+      radio_therapy,
+      npi_cat
+    ),
+    label = list(
+      age_at_diagnosis ~ "Age at diagnosis (years)",
+      er_status        ~ "ER status",
+      her2_status      ~ "HER2 status",
+      pr_status        ~ "PR status",
+      chemotherapy     ~ "Chemotherapy",
+      hormone_therapy  ~ "Hormone therapy",
+      radio_therapy    ~ "Radiotherapy",
+      npi_cat          ~ "Nottingham Prognostic Index group"
+    ),
+    statistic = list(
+      age_at_diagnosis ~ "{mean} ({sd})"
+    ),
+    digits = list(
+      age_at_diagnosis ~ 1
+    )
+  )
+```
+
+

@@ -1,0 +1,32 @@
+project:
+  output-dir: docs
+  type: book
+
+book:
+  title: "Term project of Survival Analysis course"
+  author: "Nguyen The Nguyen PHAM"
+  chapters:
+    - index.qmd
+    # - intro.qmd
+    # - summary.qmd
+    # - references.qmd
+
+warning: false
+message: false
+
+knitr:
+  opts_chunk:
+    out.width: "100%"
+    out.height: "100%"
+
+bibliography: references.bib
+
+format:
+  html:
+    code-fold: true
+    theme:
+      - cosmo
+      - brand
+
+editor: visual
+
