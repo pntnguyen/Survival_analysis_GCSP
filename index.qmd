@@ -1,6 +1,6 @@
 # Preliminary analysis {.unnumbered}
 
-[Proporsal slide](https://pntnguyen.github.io/Survival_analysis_GCSP/slide.html#/title-slide){target="_blank"}
+[Proporsal slide](slide.html){target="_blank"}
 
 
 # Data pre-processing
