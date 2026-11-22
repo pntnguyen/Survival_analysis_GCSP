@@ -272,8 +272,10 @@ survfit2(Surv(overall_survival_months, surv) ~ cluster_k2, data = df_clust) |>
 
 # Exploratory analysis
 
+## Clinical characteristic
+
 ```{r}
-df_clust |>
+df_clust %<>%
   mutate(npi_cat = cut(
     nottingham_prognostic_index,
     breaks = c(-Inf, 2.4, 3.4, 4.4, 5.4, 6.4, Inf),
@@ -310,5 +312,70 @@ df_clust |>
     )
   )
 ```
+## Age at diagnosis
 
+```{r}
+df_clust |>
+  filter(!is.na(cluster_k2)) |>
+  ggplot(aes(x = age_at_diagnosis, fill = cluster_k2, color = cluster_k2)) +
+  geom_density(alpha = 0.4) +
+  labs(x = "Age at diagnosis (years)", y = "Density", fill = "Cluster", color = "Cluster") +
+  theme_bw() +
+  theme(legend.position = "bottom")
+```
+
+## Binary 
+
+```{r}
+df_clust |>
+  filter(!is.na(cluster_k2)) |>
+  select(cluster_k2, er_status, her2_status, pr_status,
+         chemotherapy, hormone_therapy, radio_therapy) |>
+  mutate(across(
+    c(chemotherapy, hormone_therapy, radio_therapy),
+    ~ factor(.x, levels = c(0, 1), labels = c("No", "Yes"))
+  )) |>
+  mutate(across(-cluster_k2, as.character)) |>
+  pivot_longer(-cluster_k2, names_to = "variable", values_to = "value") |>
+  filter(!is.na(value)) |>
+  count(cluster_k2, variable, value) |>
+  group_by(cluster_k2, variable) |>
+  mutate(pct = n / sum(n)) |>
+  ungroup() |>
+  filter(value %in% c("Yes", "Positive")) |>      # keep only the "yes/positive" category
+  mutate(variable = recode(variable,
+    er_status       = "ER positive",
+    her2_status     = "HER2 positive",
+    pr_status       = "PR positive",
+    chemotherapy    = "Chemotherapy",
+    hormone_therapy = "Hormone therapy",
+    radio_therapy   = "Radiotherapy"
+  )) |>
+  ggplot(aes(x = cluster_k2, y = pct, fill = cluster_k2)) +
+  geom_col(width = 0.6) +
+  geom_text(aes(label = scales::percent(pct, accuracy = 1)), vjust = -0.3, size = 3) +
+  facet_wrap(~variable, ncol = 3) +
+  scale_y_continuous(labels = scales::percent, expand = expansion(mult = c(0, 0.12))) +
+  labs(x = "Cluster", y = "Percentage within cluster") +
+  theme_bw() +
+  theme(legend.position = "none")
+```
+
+```{r}
+df_clust |>
+  filter(!is.na(cluster_k2), !is.na(npi_cat)) |>
+  count(cluster_k2, npi_cat) |>
+  group_by(cluster_k2) |>
+  mutate(pct = n / sum(n)) |>
+  ggplot(aes(x = npi_cat, y = pct, fill = cluster_k2)) +
+  geom_col(position = position_dodge(width = 0.9)) +
+  geom_text(
+    aes(label = scales::percent(pct, accuracy = 1)),
+    position = position_dodge(width = 0.9), vjust = -0.3, size = 3
+  ) +
+  scale_y_continuous(labels = scales::percent, expand = expansion(mult = c(0, 0.12))) +
+  labs(x = "NPI group", y = "Percentage within cluster", fill = "Cluster") +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 30, hjust = 1))
+```
 

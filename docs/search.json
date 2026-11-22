@@ -68,5 +68,35 @@
     "crumbs": [
       "Preliminary analysis"
     ]
+  },
+  {
+    "objectID": "index.html#clinical-characteristic",
+    "href": "index.html#clinical-characteristic",
+    "title": "Term project of Survival Analysis course",
+    "section": "Clinical characteristic",
+    "text": "Clinical characteristic\n\n\nCode\ndf_clust %&lt;&gt;%\n  mutate(npi_cat = cut(\n    nottingham_prognostic_index,\n    breaks = c(-Inf, 2.4, 3.4, 4.4, 5.4, 6.4, Inf),\n    labels = c(\"Excellent\", \"Good\", \"Moderate 1\", \"Moderate 2\", \"Poor\", \"Very poor\"),\n    right = TRUE\n  )) |&gt;\n  tbl_summary(\n    by = cluster_k2,\n    include = c(\n      age_at_diagnosis,\n      er_status,\n      her2_status,\n      pr_status,\n      chemotherapy,\n      hormone_therapy,\n      radio_therapy,\n      npi_cat\n    ),\n    label = list(\n      age_at_diagnosis ~ \"Age at diagnosis (years)\",\n      er_status        ~ \"ER status\",\n      her2_status      ~ \"HER2 status\",\n      pr_status        ~ \"PR status\",\n      chemotherapy     ~ \"Chemotherapy\",\n      hormone_therapy  ~ \"Hormone therapy\",\n      radio_therapy    ~ \"Radiotherapy\",\n      npi_cat          ~ \"Nottingham Prognostic Index group\"\n    ),\n    statistic = list(\n      age_at_diagnosis ~ \"{mean} ({sd})\"\n    ),\n    digits = list(\n      age_at_diagnosis ~ 1\n    )\n  )\n\n\n\n\n\n\n\n\n\n\n\n\n\nCharacteristic\n1\nN = 1,1681\n2\nN = 7361\n\n\n\n\nAge at diagnosis (years)\n62.7 (12.4)\n58.6 (13.5)\n\n\nER status\n\n\n\n\n\n\n    Negative\n72 (6.2%)\n373 (51%)\n\n\n    Positive\n1,096 (94%)\n363 (49%)\n\n\nHER2 status\n\n\n\n\n\n\n    Negative\n1,107 (95%)\n561 (76%)\n\n\n    Positive\n61 (5.2%)\n175 (24%)\n\n\nPR status\n\n\n\n\n\n\n    Negative\n384 (33%)\n511 (69%)\n\n\n    Positive\n784 (67%)\n225 (31%)\n\n\nChemotherapy\n129 (11%)\n267 (36%)\n\n\nHormone therapy\n802 (69%)\n372 (51%)\n\n\nRadiotherapy\n656 (56%)\n481 (65%)\n\n\nNottingham Prognostic Index group\n\n\n\n\n\n\n    Excellent\n144 (12%)\n19 (2.6%)\n\n\n    Good\n388 (33%)\n89 (12%)\n\n\n    Moderate 1\n374 (32%)\n288 (39%)\n\n\n    Moderate 2\n182 (16%)\n226 (31%)\n\n\n    Poor\n80 (6.8%)\n114 (15%)\n\n\n    Very poor\n0 (0%)\n0 (0%)\n\n\n\n1 Mean (SD); n (%)",
+    "crumbs": [
+      "Preliminary analysis"
+    ]
+  },
+  {
+    "objectID": "index.html#age-at-diagnosis",
+    "href": "index.html#age-at-diagnosis",
+    "title": "Term project of Survival Analysis course",
+    "section": "Age at diagnosis",
+    "text": "Age at diagnosis\n\n\nCode\ndf_clust |&gt;\n  filter(!is.na(cluster_k2)) |&gt;\n  ggplot(aes(x = age_at_diagnosis, fill = cluster_k2, color = cluster_k2)) +\n  geom_density(alpha = 0.4) +\n  labs(x = \"Age at diagnosis (years)\", y = \"Density\", fill = \"Cluster\", color = \"Cluster\") +\n  theme_bw() +\n  theme(legend.position = \"bottom\")",
+    "crumbs": [
+      "Preliminary analysis"
+    ]
+  },
+  {
+    "objectID": "index.html#binary",
+    "href": "index.html#binary",
+    "title": "Term project of Survival Analysis course",
+    "section": "Binary",
+    "text": "Binary\n\n\nCode\ndf_clust |&gt;\n  filter(!is.na(cluster_k2)) |&gt;\n  select(cluster_k2, er_status, her2_status, pr_status,\n         chemotherapy, hormone_therapy, radio_therapy) |&gt;\n  mutate(across(\n    c(chemotherapy, hormone_therapy, radio_therapy),\n    ~ factor(.x, levels = c(0, 1), labels = c(\"No\", \"Yes\"))\n  )) |&gt;\n  mutate(across(-cluster_k2, as.character)) |&gt;\n  pivot_longer(-cluster_k2, names_to = \"variable\", values_to = \"value\") |&gt;\n  filter(!is.na(value)) |&gt;\n  count(cluster_k2, variable, value) |&gt;\n  group_by(cluster_k2, variable) |&gt;\n  mutate(pct = n / sum(n)) |&gt;\n  ungroup() |&gt;\n  filter(value %in% c(\"Yes\", \"Positive\")) |&gt;      # keep only the \"yes/positive\" category\n  mutate(variable = recode(variable,\n    er_status       = \"ER positive\",\n    her2_status     = \"HER2 positive\",\n    pr_status       = \"PR positive\",\n    chemotherapy    = \"Chemotherapy\",\n    hormone_therapy = \"Hormone therapy\",\n    radio_therapy   = \"Radiotherapy\"\n  )) |&gt;\n  ggplot(aes(x = cluster_k2, y = pct, fill = cluster_k2)) +\n  geom_col(width = 0.6) +\n  geom_text(aes(label = scales::percent(pct, accuracy = 1)), vjust = -0.3, size = 3) +\n  facet_wrap(~variable, ncol = 3) +\n  scale_y_continuous(labels = scales::percent, expand = expansion(mult = c(0, 0.12))) +\n  labs(x = \"Cluster\", y = \"Percentage within cluster\") +\n  theme_bw() +\n  theme(legend.position = \"none\")\n\n\n\n\n\n\n\n\n\n\n\nCode\ndf_clust |&gt;\n  filter(!is.na(cluster_k2), !is.na(npi_cat)) |&gt;\n  count(cluster_k2, npi_cat) |&gt;\n  group_by(cluster_k2) |&gt;\n  mutate(pct = n / sum(n)) |&gt;\n  ggplot(aes(x = npi_cat, y = pct, fill = cluster_k2)) +\n  geom_col(position = position_dodge(width = 0.9)) +\n  geom_text(\n    aes(label = scales::percent(pct, accuracy = 1)),\n    position = position_dodge(width = 0.9), vjust = -0.3, size = 3\n  ) +\n  scale_y_continuous(labels = scales::percent, expand = expansion(mult = c(0, 0.12))) +\n  labs(x = \"NPI group\", y = \"Percentage within cluster\", fill = \"Cluster\") +\n  theme_bw() +\n  theme(axis.text.x = element_text(angle = 30, hjust = 1))",
+    "crumbs": [
+      "Preliminary analysis"
+    ]
   }
 ]
