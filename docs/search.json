@@ -1,0 +1,72 @@
+[
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Term project of Survival Analysis course",
+    "section": "",
+    "text": "Preliminary analysis\nProporsal slide",
+    "crumbs": [
+      "Preliminary analysis"
+    ]
+  },
+  {
+    "objectID": "index.html#package",
+    "href": "index.html#package",
+    "title": "Term project of Survival Analysis course",
+    "section": "Package",
+    "text": "Package\n\n\nCode\nrequired &lt;- c(\"readr\",\n              \"tidyverse\",\n              \"magrittr\",\n              \"survival\",\n              \"survminer\",\n              \"skimr\",\n              \"msigdbr\",\n              \"purrr\",\n              \"factoextra\",\n              \"survival\",\n              \"ggsurvfit\",\n              \"ggplot2\",\n              \"gtsummary\")\n\n\nInstalling those that are not installed yet:\n\n\nCode\nto_install &lt;- required[!required %in% installed.packages()[, \"Package\"]]\nif (length(to_install))\n  install.packages(to_install)\n\n\nLoading the packages for interactive use:\n\n\nCode\ninvisible(sapply(required, library, character.only = TRUE))",
+    "crumbs": [
+      "Preliminary analysis"
+    ]
+  },
+  {
+    "objectID": "index.html#data",
+    "href": "index.html#data",
+    "title": "Term project of Survival Analysis course",
+    "section": "Data",
+    "text": "Data\n\n\nCode\ndf &lt;- read_csv(\"data/METABRIC_RNA_Mutation.csv\")\n\n\n\n\n\nExtract clinical and expression columns\n\n\nCode\nlibrary(dplyr)\nlibrary(stringr)\n\n# Split the column names into the 3 types (same logic as your Python code)\nclinical_cols &lt;- names(df)[1:31]\n\nmutation_cols &lt;- names(df)[str_detect(tolower(names(df)), \"_mut$\")]\n\nexpression_cols &lt;- setdiff(names(df)[32:ncol(df)], mutation_cols)\n\n# Select clinical + gene expression only (drops the mutation columns)\ndf_ce &lt;- df |&gt;\n  select(all_of(c(clinical_cols, expression_cols)))\n\npaste(\"clinical variables:\", length(clinical_cols))\n\n\n[1] \"clinical variables: 31\"\n\n\nCode\npaste(\"gene expression variables:\", length(expression_cols))\n\n\n[1] \"gene expression variables: 489\"\n\n\n\nClinical variables\n\n\nCode\ndf |&gt; \n  select(clinical_cols) |&gt; \n  skim()\n\n\n\nData summary\n\n\nName\nselect(df, clinical_cols)\n\n\nNumber of rows\n1904\n\n\nNumber of columns\n31\n\n\n_______________________\n\n\n\nColumn type frequency:\n\n\n\ncharacter\n17\n\n\nnumeric\n14\n\n\n________________________\n\n\n\nGroup variables\nNone\n\n\n\nVariable type: character\n\n\n\n\n\n\n\n\n\n\n\n\n\nskim_variable\nn_missing\ncomplete_rate\nmin\nmax\nempty\nn_unique\nwhitespace\n\n\n\n\ntype_of_breast_surgery\n22\n0.99\n10\n17\n0\n2\n0\n\n\ncancer_type\n0\n1.00\n13\n14\n0\n2\n0\n\n\ncancer_type_detailed\n15\n0.99\n6\n41\n0\n6\n0\n\n\ncellularity\n54\n0.97\n3\n8\n0\n3\n0\n\n\npam50_+_claudin-low_subtype\n0\n1.00\n2\n11\n0\n7\n0\n\n\ner_status_measured_by_ihc\n30\n0.98\n7\n8\n0\n2\n0\n\n\ner_status\n0\n1.00\n8\n8\n0\n2\n0\n\n\nher2_status_measured_by_snp6\n0\n1.00\n4\n7\n0\n4\n0\n\n\nher2_status\n0\n1.00\n8\n8\n0\n2\n0\n\n\ntumor_other_histologic_subtype\n15\n0.99\n5\n19\n0\n8\n0\n\n\ninferred_menopausal_state\n0\n1.00\n3\n4\n0\n2\n0\n\n\nintegrative_cluster\n0\n1.00\n1\n4\n0\n11\n0\n\n\nprimary_tumor_laterality\n106\n0.94\n4\n5\n0\n2\n0\n\n\noncotree_code\n15\n0.99\n3\n6\n0\n6\n0\n\n\npr_status\n0\n1.00\n8\n8\n0\n2\n0\n\n\n3-gene_classifier_subtype\n204\n0.89\n5\n21\n0\n4\n0\n\n\ndeath_from_cancer\n1\n1.00\n6\n20\n0\n3\n0\n\n\n\nVariable type: numeric\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nskim_variable\nn_missing\ncomplete_rate\nmean\nsd\np0\np25\np50\np75\np100\nhist\n\n\n\n\npatient_id\n0\n1.00\n3921.98\n2358.48\n0.00\n896.50\n4730.50\n5536.25\n7299.00\n▆▁▃▇▅\n\n\nage_at_diagnosis\n0\n1.00\n61.09\n12.98\n21.93\n51.38\n61.77\n70.59\n96.29\n▁▅▇▇▁\n\n\nchemotherapy\n0\n1.00\n0.21\n0.41\n0.00\n0.00\n0.00\n0.00\n1.00\n▇▁▁▁▂\n\n\ncohort\n0\n1.00\n2.64\n1.23\n1.00\n1.00\n3.00\n3.00\n5.00\n▅▃▇▂▂\n\n\nneoplasm_histologic_grade\n72\n0.96\n2.42\n0.65\n1.00\n2.00\n3.00\n3.00\n3.00\n▂▁▆▁▇\n\n\nhormone_therapy\n0\n1.00\n0.62\n0.49\n0.00\n0.00\n1.00\n1.00\n1.00\n▅▁▁▁▇\n\n\nlymph_nodes_examined_positive\n0\n1.00\n2.00\n4.08\n0.00\n0.00\n0.00\n2.00\n45.00\n▇▁▁▁▁\n\n\nmutation_count\n45\n0.98\n5.70\n4.06\n1.00\n3.00\n5.00\n7.00\n80.00\n▇▁▁▁▁\n\n\nnottingham_prognostic_index\n0\n1.00\n4.03\n1.14\n1.00\n3.05\n4.04\n5.04\n6.36\n▂▆▇▅▂\n\n\noverall_survival_months\n0\n1.00\n125.12\n76.33\n0.00\n60.83\n115.62\n184.72\n355.20\n▇▇▆▃▁\n\n\noverall_survival\n0\n1.00\n0.42\n0.49\n0.00\n0.00\n0.00\n1.00\n1.00\n▇▁▁▁▆\n\n\nradio_therapy\n0\n1.00\n0.60\n0.49\n0.00\n0.00\n1.00\n1.00\n1.00\n▆▁▁▁▇\n\n\ntumor_size\n20\n0.99\n26.24\n15.16\n1.00\n17.00\n23.00\n30.00\n182.00\n▇▁▁▁▁\n\n\ntumor_stage\n501\n0.74\n1.75\n0.63\n0.00\n1.00\n2.00\n2.00\n4.00\n▁▅▇▁▁\n\n\n\n\n\n\n\nGene expression variables\n\n\nCode\ndf |&gt;\n  select(all_of(expression_cols)) |&gt;\n  select(1:10) |&gt;\n  skim()\n\n\n\nData summary\n\n\nName\nselect(select(df, all_of(…\n\n\nNumber of rows\n1904\n\n\nNumber of columns\n10\n\n\n_______________________\n\n\n\nColumn type frequency:\n\n\n\nnumeric\n10\n\n\n________________________\n\n\n\nGroup variables\nNone\n\n\n\nVariable type: numeric\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nskim_variable\nn_missing\ncomplete_rate\nmean\nsd\np0\np25\np50\np75\np100\nhist\n\n\n\n\nbrca1\n0\n1\n0\n1\n-2.44\n-0.72\n-0.12\n0.55\n4.55\n▂▇▃▁▁\n\n\nbrca2\n0\n1\n0\n1\n-2.78\n-0.70\n-0.06\n0.63\n3.74\n▁▇▇▂▁\n\n\npalb2\n0\n1\n0\n1\n-4.38\n-0.68\n-0.02\n0.64\n4.62\n▁▂▇▂▁\n\n\npten\n0\n1\n0\n1\n-5.93\n-0.56\n0.11\n0.64\n3.25\n▁▁▃▇▁\n\n\ntp53\n0\n1\n0\n1\n-2.48\n-0.67\n-0.03\n0.64\n4.29\n▂▇▆▁▁\n\n\natm\n0\n1\n0\n1\n-3.17\n-0.66\n0.00\n0.69\n3.82\n▁▅▇▂▁\n\n\ncdh1\n0\n1\n0\n1\n-3.32\n-0.46\n0.12\n0.65\n2.82\n▁▂▇▆▁\n\n\nchek2\n0\n1\n0\n1\n-2.69\n-0.74\n-0.13\n0.54\n4.54\n▁▇▅▁▁\n\n\nnbn\n0\n1\n0\n1\n-3.69\n-0.67\n-0.01\n0.64\n5.37\n▁▇▇▁▁\n\n\nnf1\n0\n1\n0\n1\n-2.97\n-0.68\n-0.05\n0.67\n6.18\n▂▇▃▁▁",
+    "crumbs": [
+      "Preliminary analysis"
+    ]
+  },
+  {
+    "objectID": "index.html#biological-pathway-selection",
+    "href": "index.html#biological-pathway-selection",
+    "title": "Term project of Survival Analysis course",
+    "section": "Biological pathway selection",
+    "text": "Biological pathway selection\n4 biological pathways:\n\nEstrogen / hormone signaling\nPI3K–AKT–mTOR signaling\nCell cycle / proliferation\nDNA repair\n\n\n\nCode\nhallmark &lt;- msigdbr(species = \"Homo sapiens\", collection = \"H\")\n\npathway_map &lt;- tribble(\n  ~gs_name,                           ~pathway,\n  \"HALLMARK_ESTROGEN_RESPONSE_EARLY\", \"Estrogen / hormone signaling\",\n  \"HALLMARK_ESTROGEN_RESPONSE_LATE\",  \"Estrogen / hormone signaling\",\n  \"HALLMARK_PI3K_AKT_MTOR_SIGNALING\", \"PI3K-AKT-mTOR signaling\",\n  \"HALLMARK_E2F_TARGETS\",             \"Cell cycle / proliferation\",\n  \"HALLMARK_G2M_CHECKPOINT\",          \"Cell cycle / proliferation\",\n  \"HALLMARK_DNA_REPAIR\",              \"DNA repair\"\n)\n\n\nSummary how many genes per pathway are available\n\n\nCode\npathway_genes &lt;- hallmark |&gt;\n  inner_join(pathway_map, by = \"gs_name\") |&gt;\n  distinct(pathway, gene_symbol) |&gt;\n  mutate(gene_lower = tolower(gene_symbol))   # your columns are lowercase (e.g. brca1)\n\n\n# Use the FULL data frame, not the one trimmed with select(1:31)\ndata_genes &lt;- tolower(names(df))\n\npathway_genes &lt;- pathway_genes |&gt;\n  mutate(in_data = gene_lower %in% data_genes)\n\n# Summary: how many genes per pathway are available\npathway_genes |&gt;\n  group_by(pathway) |&gt;\n  summarise(\n    total_genes = n(),\n    genes_available   = sum(in_data),\n    percentage         = round(100 * genes_available / total_genes, 1)\n  )\n\n\n# A tibble: 4 × 4\n  pathway                      total_genes genes_available percentage\n  &lt;chr&gt;                              &lt;int&gt;           &lt;int&gt;      &lt;dbl&gt;\n1 Cell cycle / proliferation           327              38       11.6\n2 DNA repair                           150               3        2  \n3 Estrogen / hormone signaling         299              16        5.4\n4 PI3K-AKT-mTOR signaling              105              24       22.9\n\n\nI selected Estrogen / hormone signaling, PI3K–AKT–mTOR signaling, Cell cycle / proliferation because they have many available genes\n\n\nCode\npathway_genes |&gt;\n  filter(in_data) |&gt;\n  group_by(pathway) |&gt;\n  summarise(genes = paste(gene_symbol, collapse = \", \"))\n\n\n# A tibble: 4 × 2\n  pathway                      genes                                            \n  &lt;chr&gt;                        &lt;chr&gt;                                            \n1 Cell cycle / proliferation   AURKA, BARD1, BRCA1, BRCA2, CCNE1, CDC25A, CDK1,…\n2 DNA repair                   RAD51, SMAD5, TP53                               \n3 Estrogen / hormone signaling AR, BCL2, CCND1, HES1, IGF1R, JAK2, MAPT, MYC, N…\n4 PI3K-AKT-mTOR signaling      AKT1, AKT1S1, CDK1, CDK2, CDK4, CDKN1A, CDKN1B, …",
+    "crumbs": [
+      "Preliminary analysis"
+    ]
+  },
+  {
+    "objectID": "index.html#pathway-scoring",
+    "href": "index.html#pathway-scoring",
+    "title": "Term project of Survival Analysis course",
+    "section": "Pathway scoring",
+    "text": "Pathway scoring\nStandardize expression of each genes and calculate pathway score as below:\n\\[\nS_{i,p} = \\frac{1}{|G_p|} \\sum_{g \\in G_p} Z_{ig}\n\\]\nwhere:\n\n\\(i\\): patient\n\\(p\\): pathway\n\\(G_p\\): genes belonging to pathway \\(p\\) and present in METABRIC\n\\(Z_{ig}\\): standardized expression of gene \\(g\\) in patient \\(i\\)\n\n\n\nCode\n# 1. Map each available gene to its actual column name in the data\ncol_lookup &lt;- tibble(col = names(df), gene_lower = tolower(names(df)))\n\npathway_cols &lt;- pathway_genes |&gt;\n  filter(in_data) |&gt;\n  inner_join(col_lookup, by = \"gene_lower\")   # adds the `col` column\n\n# 2. Z-score each gene column (mean 0, SD 1 across patients)\ngene_cols &lt;- unique(pathway_cols$col)\n\nz_mat &lt;- df |&gt;\n  select(all_of(gene_cols)) |&gt;\n  mutate(across(everything(), ~ as.numeric(scale(.x))))\n\n# 3. Pathway score = mean z-score of the genes in G_p, per patient\npathway_scores &lt;- pathway_cols |&gt;\n  split(~pathway) |&gt;\n  map(\\(x) rowMeans(z_mat[, x$col, drop = FALSE], na.rm = TRUE)) |&gt;\n  as_tibble() |&gt;\n  rename(\n    score_hormone    = `Estrogen / hormone signaling`,\n    score_pi3k_akt   = `PI3K-AKT-mTOR signaling`,\n    score_cell_cycle = `Cell cycle / proliferation`,\n    score_dna_repair = `DNA repair`\n  )\n\ndf_full &lt;- bind_cols(df, pathway_scores) |&gt; \n  select(-c(score_dna_repair))\n\ndf_full |&gt;\n  select(patient_id, starts_with(\"score_\")) |&gt; \n  head()\n\n\n# A tibble: 6 × 4\n  patient_id score_cell_cycle score_hormone score_pi3k_akt\n       &lt;dbl&gt;            &lt;dbl&gt;         &lt;dbl&gt;          &lt;dbl&gt;\n1          0          -0.161          0.443       -0.272  \n2          2           0.0540         0.372        0.00338\n3          5           0.296         -0.194       -0.0522 \n4          6           0.247         -0.249       -0.0420 \n5          8           0.532         -0.375        0.119  \n6         10           0.157         -0.120        0.475",
+    "crumbs": [
+      "Preliminary analysis"
+    ]
+  },
+  {
+    "objectID": "index.html#clustering-algorithm",
+    "href": "index.html#clustering-algorithm",
+    "title": "Term project of Survival Analysis course",
+    "section": "Clustering algorithm",
+    "text": "Clustering algorithm\nI used k-mean clustering algorithm to cluster 2 subgroups based on 3 pathway score\n\n\nCode\n# 1. Prepare the score matrix (complete cases only, rescaled so all 4 scores have equal weight)\nscore_df &lt;- df_full |&gt;\n  mutate(patient_row = row_number()) |&gt;\n  select(patient_row, starts_with(\"score_\")) |&gt;\n  drop_na()\n\nscore_mat &lt;- score_df |&gt;\n  select(starts_with(\"score_\")) |&gt;\n  scale()\n\n# 2. Run k-means for k = 2 and k = 3\nset.seed(123)\nkm2 &lt;- kmeans(score_mat, centers = 2, nstart = 50)\n\n# 3. Attach cluster labels back to the data\nscore_df &lt;- score_df |&gt;\n  mutate(cluster_k2 = factor(km2$cluster))\n\ndf_clust &lt;- df_full |&gt;\n  mutate(patient_row = row_number()) |&gt;\n  left_join(score_df |&gt; select(patient_row, cluster_k2), by = \"patient_row\")\n\n# Visual profile\ndf_clust |&gt;\n  filter(!is.na(cluster_k2)) |&gt;\n  select(cluster_k2, starts_with(\"score_\")) |&gt;\n  pivot_longer(-cluster_k2, names_to = \"pathway\", values_to = \"score\") |&gt;\n  ggplot(aes(x = cluster_k2, y = score, fill = cluster_k2)) +\n  geom_boxplot() +\n  facet_wrap(~pathway) +\n  theme_bw() +\n  theme(legend.position = \"none\")\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nNote\n\n\n\nWe clustered 2 groups:\n\nGroup 1: Lower cell cycle, higher hormone signaling, lower PI3K-AKT-mTOR signaling pathway score\nGroup 2: Higher cell cycle, lower hormone signaling, higher PI3K-AKT-mTOR signaling pathway score",
+    "crumbs": [
+      "Preliminary analysis"
+    ]
+  },
+  {
+    "objectID": "index.html#km-curve",
+    "href": "index.html#km-curve",
+    "title": "Term project of Survival Analysis course",
+    "section": "KM-curve",
+    "text": "KM-curve\n\n\nCode\ndf_clust %&lt;&gt;%\n  mutate(surv = case_when(death_from_cancer == \"Living\" ~ 0, .default = 1))\n\nsurvfit2(Surv(overall_survival_months, surv) ~ cluster_k2, data = df_clust) |&gt;\n  ggsurvfit() +\n  add_confidence_interval() +\n  labs(x = \"Time (months)\", y = \"Overall survival probability\",\n       color = \"Cluster\", fill = \"Cluster\") +\n  scale_ggsurvfit() +\n  theme_minimal() +\n  theme(legend.position = \"bottom\")",
+    "crumbs": [
+      "Preliminary analysis"
+    ]
+  }
+]
