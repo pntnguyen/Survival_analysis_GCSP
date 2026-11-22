@@ -90,11 +90,21 @@
     ]
   },
   {
-    "objectID": "index.html#binary",
-    "href": "index.html#binary",
+    "objectID": "index.html#binary-variables",
+    "href": "index.html#binary-variables",
     "title": "Term project of Survival Analysis course",
-    "section": "Binary",
-    "text": "Binary\n\n\nCode\ndf_clust |&gt;\n  filter(!is.na(cluster_k2)) |&gt;\n  select(cluster_k2, er_status, her2_status, pr_status,\n         chemotherapy, hormone_therapy, radio_therapy) |&gt;\n  mutate(across(\n    c(chemotherapy, hormone_therapy, radio_therapy),\n    ~ factor(.x, levels = c(0, 1), labels = c(\"No\", \"Yes\"))\n  )) |&gt;\n  mutate(across(-cluster_k2, as.character)) |&gt;\n  pivot_longer(-cluster_k2, names_to = \"variable\", values_to = \"value\") |&gt;\n  filter(!is.na(value)) |&gt;\n  count(cluster_k2, variable, value) |&gt;\n  group_by(cluster_k2, variable) |&gt;\n  mutate(pct = n / sum(n)) |&gt;\n  ungroup() |&gt;\n  filter(value %in% c(\"Yes\", \"Positive\")) |&gt;      # keep only the \"yes/positive\" category\n  mutate(variable = recode(variable,\n    er_status       = \"ER positive\",\n    her2_status     = \"HER2 positive\",\n    pr_status       = \"PR positive\",\n    chemotherapy    = \"Chemotherapy\",\n    hormone_therapy = \"Hormone therapy\",\n    radio_therapy   = \"Radiotherapy\"\n  )) |&gt;\n  ggplot(aes(x = cluster_k2, y = pct, fill = cluster_k2)) +\n  geom_col(width = 0.6) +\n  geom_text(aes(label = scales::percent(pct, accuracy = 1)), vjust = -0.3, size = 3) +\n  facet_wrap(~variable, ncol = 3) +\n  scale_y_continuous(labels = scales::percent, expand = expansion(mult = c(0, 0.12))) +\n  labs(x = \"Cluster\", y = \"Percentage within cluster\") +\n  theme_bw() +\n  theme(legend.position = \"none\")\n\n\n\n\n\n\n\n\n\n\n\nCode\ndf_clust |&gt;\n  filter(!is.na(cluster_k2), !is.na(npi_cat)) |&gt;\n  count(cluster_k2, npi_cat) |&gt;\n  group_by(cluster_k2) |&gt;\n  mutate(pct = n / sum(n)) |&gt;\n  ggplot(aes(x = npi_cat, y = pct, fill = cluster_k2)) +\n  geom_col(position = position_dodge(width = 0.9)) +\n  geom_text(\n    aes(label = scales::percent(pct, accuracy = 1)),\n    position = position_dodge(width = 0.9), vjust = -0.3, size = 3\n  ) +\n  scale_y_continuous(labels = scales::percent, expand = expansion(mult = c(0, 0.12))) +\n  labs(x = \"NPI group\", y = \"Percentage within cluster\", fill = \"Cluster\") +\n  theme_bw() +\n  theme(axis.text.x = element_text(angle = 30, hjust = 1))",
+    "section": "Binary variables",
+    "text": "Binary variables\n\n\nCode\ndf_clust |&gt;\n  filter(!is.na(cluster_k2)) |&gt;\n  select(cluster_k2, er_status, her2_status, pr_status,\n         chemotherapy, hormone_therapy, radio_therapy) |&gt;\n  mutate(across(\n    c(chemotherapy, hormone_therapy, radio_therapy),\n    ~ factor(.x, levels = c(0, 1), labels = c(\"No\", \"Yes\"))\n  )) |&gt;\n  mutate(across(-cluster_k2, as.character)) |&gt;\n  pivot_longer(-cluster_k2, names_to = \"variable\", values_to = \"value\") |&gt;\n  filter(!is.na(value)) |&gt;\n  count(cluster_k2, variable, value) |&gt;\n  group_by(cluster_k2, variable) |&gt;\n  mutate(pct = n / sum(n)) |&gt;\n  ungroup() |&gt;\n  filter(value %in% c(\"Yes\", \"Positive\")) |&gt;      # keep only the \"yes/positive\" category\n  mutate(variable = recode(variable,\n    er_status       = \"ER positive\",\n    her2_status     = \"HER2 positive\",\n    pr_status       = \"PR positive\",\n    chemotherapy    = \"Chemotherapy\",\n    hormone_therapy = \"Hormone therapy\",\n    radio_therapy   = \"Radiotherapy\"\n  )) |&gt;\n  ggplot(aes(x = cluster_k2, y = pct, fill = cluster_k2)) +\n  geom_col(width = 0.6) +\n  geom_text(aes(label = scales::percent(pct, accuracy = 1)), vjust = -0.3, size = 3) +\n  facet_wrap(~variable, ncol = 3) +\n  scale_y_continuous(labels = scales::percent, expand = expansion(mult = c(0, 0.12))) +\n  labs(x = \"Cluster\", y = \"Percentage within cluster\") +\n  theme_bw() +\n  theme(legend.position = \"none\")",
+    "crumbs": [
+      "Preliminary analysis"
+    ]
+  },
+  {
+    "objectID": "index.html#nottingham-prognostic-index",
+    "href": "index.html#nottingham-prognostic-index",
+    "title": "Term project of Survival Analysis course",
+    "section": "Nottingham prognostic index",
+    "text": "Nottingham prognostic index\n\n\nCode\ndf_clust |&gt;\n  filter(!is.na(cluster_k2), !is.na(npi_cat)) |&gt;\n  count(cluster_k2, npi_cat) |&gt;\n  group_by(cluster_k2) |&gt;\n  mutate(pct = n / sum(n)) |&gt;\n  ggplot(aes(x = npi_cat, y = pct, fill = cluster_k2)) +\n  geom_col(position = position_dodge(width = 0.9)) +\n  geom_text(\n    aes(label = scales::percent(pct, accuracy = 1)),\n    position = position_dodge(width = 0.9), vjust = -0.3, size = 3\n  ) +\n  scale_y_continuous(labels = scales::percent, expand = expansion(mult = c(0, 0.12))) +\n  labs(x = \"NPI group\", y = \"Percentage within cluster\", fill = \"Cluster\") +\n  theme_bw() +\n  theme(axis.text.x = element_text(angle = 30, hjust = 1))",
     "crumbs": [
       "Preliminary analysis"
     ]

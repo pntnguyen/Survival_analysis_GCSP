@@ -324,7 +324,7 @@ df_clust |>
   theme(legend.position = "bottom")
 ```
 
-## Binary 
+## Binary variables
 
 ```{r}
 df_clust |>
@@ -360,6 +360,10 @@ df_clust |>
   theme_bw() +
   theme(legend.position = "none")
 ```
+
+## Nottingham prognostic index
+
+
 
 ```{r}
 df_clust |>
