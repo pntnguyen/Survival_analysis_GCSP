@@ -1,6 +1,6 @@
 # Preliminary analysis {.unnumbered}
 
-[Proporsal slide](slide.html){target="_blank"}
+[Proposal slide](slide.html){target="_blank"}
 
 
 # Data pre-processing

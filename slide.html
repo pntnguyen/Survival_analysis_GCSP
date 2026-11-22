@@ -442,7 +442,7 @@
   <meta name="generator" content="quarto-1.8.26">
 
   <meta name="author" content="Nguyen The Nguyen PHAM">
-  <title>Proporsal</title>
+  <title>Proposal</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
@@ -986,7 +986,7 @@ margin-right: 0; }
     <div class="slides">
 
 <section id="title-slide" class="quarto-title-block center">
-  <h1 class="title">Proporsal</h1>
+  <h1 class="title">Proposal</h1>
 
 <div class="quarto-title-authors">
 <div class="quarto-title-author">
@@ -1013,58 +1013,72 @@ Nguyen The Nguyen PHAM
 <section id="gene-expression" class="slide level2">
 <h2>Gene expression</h2>
 <ul>
-<li><p>If treat DNA as the factory</p></li>
-<li><p>Gene is the guildance</p></li>
-<li><p>Expression is the level of using this guildance (gene) to generate the product (protein)</p></li>
+<li><p><strong>DNA</strong>: The blueprint of the factory.</p></li>
+<li><p><strong>Gene</strong>: A specific instruction within the blueprint.</p></li>
+<li><p><strong>Gene expression</strong>: The process of using a gene’s instructions to produce a functional product, such as a protein.</p></li>
+<li><p><strong>Gene expression level</strong>: How much a gene is expressed, reflecting the amount of its product produced (in the case of protein-coding genes).</p></li>
+</ul>
+<p><strong>Gene expression reflects how actively a gene is being used to produce its functional product.</strong></p>
+<p>Higher gene expression generally indicates greater production of the gene’s RNA, and potentially its protein product.</p>
+</section>
+<section id="biological-pathway" class="slide level2">
+<h2>Biological pathway</h2>
+<ul>
+<li><p>A biological pathway is a network of interconnected biological processes involving multiple genes and proteins that work together to perform specific functions within a cell.</p></li>
+<li><p>These pathways regulate essential cellular activities, such as cell growth, survival, division, and response to external signals.</p></li>
 </ul>
 </section>
-<section id="cancer-pathway" class="slide level2">
-<h2>Cancer pathway</h2>
+<section id="breast-cancer-related-pathways" class="slide level2">
+<h2>Breast cancer-related pathways</h2>
+<p>Some key biological pathways involved in breast cancer:</p>
 <ul>
-<li>A pathway (biological pathway) is a series or network of biological activities in which multiple genes or proteins participate to carry out a specific function within a cell.</li>
-</ul>
-</section>
-<section id="cancer-pathway-1" class="slide level2">
-<h2>Cancer pathway</h2>
-<ul>
-<li><p>Some pathways in breast cancer</p>
-<ul>
-<li><p>Estrogen / hormone signaling: how cells respond to hormones.</p></li>
-<li><p>PI3K–AKT–mTOR signaling: how cells receive and transmit signals for growth/survival.</p></li>
-<li><p>Cell cycle / proliferation: how rapidly or slowly cells divide.</p></li>
-<li><p>DNA repair: how cells repair damaged DNA.</p></li>
-</ul></li>
+<li><p><strong>Estrogen / hormone signaling:</strong> Regulates cellular responses to hormones, influencing breast cancer growth and development.</p></li>
+<li><p><strong>PI3K–AKT–mTOR signaling:</strong> Regulates cell growth, survival, metabolism, and proliferation.</p></li>
+<li><p><strong>Cell cycle / proliferation:</strong> Controls cell division and regulates how cells grow and multiply.</p></li>
+<li><p><strong>DNA repair:</strong> Detects and repairs DNA damage to maintain genomic stability.</p></li>
 </ul>
 </section>
 <section id="research-question" class="slide level2">
 <h2>Research question</h2>
-<p>Do breast cancer <strong>subgroups</strong> identified through pathway-informed gene expression <strong>clustering</strong> differ in clinical characteristics and overall survival?</p>
+<p><strong>Do breast cancer subgroups identified through pathway-informed gene expression clustering differ in clinical characteristics and overall survival (OS)?</strong></p>
 </section>
 <section id="data" class="slide level2">
 <h2>Data</h2>
-<p><a href="https://www.kaggle.com/datasets/raghadalharbi/breast-cancer-gene-expression-profiles-metabric/data" target="_blank">METABRIC data</a> include:</p>
+<p><strong>METABRIC dataset</strong></p>
+<p>A cohort of 1,904 patients with breast cancer, including:</p>
 <ul>
-<li><p>Clinical variables</p></li>
-<li><p>m-RNA levels z-score (gene expression)</p></li>
-<li><p>genes mutations</p></li>
+<li><strong>Clinical data:</strong> Patient demographics, tumor characteristics, treatment information, and survival outcomes</li>
+<li><strong>Gene expression data:</strong> mRNA expression levels represented as z-scores</li>
+<li><strong>Mutation data:</strong> Genetic mutation profiles</li>
 </ul>
-<p>for 1904 patients breast cancer patient</p>
+<p>Source: <a href="https://www.kaggle.com/datasets/raghadalharbi/breast-cancer-gene-expression-profiles-metabric" target="_blank">METABRIC dataset – Kaggle</a></p>
 </section>
-<section id="methodology-for-preliminary-analysis" class="slide level2">
-<h2>Methodology for preliminary analysis</h2>
-<ul>
-<li><p>Biological pathway selection</p></li>
-<li><p>Gene mapping</p></li>
-<li><p>Coverage assessment</p></li>
-<li><p>Pathway scoring &amp; patient clustering</p></li>
-<li><p>Unsupervised clustering to create 2 subgroups</p></li>
-</ul>
+<section id="preliminary-analytical-workflow" class="slide level2">
+<h2>Preliminary analytical workflow</h2>
+<ol type="1">
+<li><p><strong>Biological pathway selection</strong><br>
+Select breast cancer-related pathways based on biological knowledge and literature.</p></li>
+<li><p><strong>Gene-to-pathway mapping</strong><br>
+Map the 489 genes available in METABRIC to the selected pathways.</p></li>
+<li><p><strong>Pathway coverage assessment</strong><br>
+Evaluate the number and proportion of pathway genes represented in the dataset.</p></li>
+</ol>
 </section>
-<section id="survival-analysis" class="slide level2">
-<h2>Survival analysis</h2>
+<section id="preliminary-analytical-workflow-1" class="slide level2">
+<h2>Preliminary analytical workflow</h2>
+<ol start="4" type="1">
+<li><p><strong>Pathway scoring</strong><br>
+Calculate pathway-level gene expression scores for each patient.</p></li>
+<li><p><strong>Patient clustering</strong><br>
+Apply unsupervised clustering to identify two patient subgroups based on pathway-level expression profiles.</p></li>
+</ol>
+</section>
+<section id="clinical-characterization-survival-analysis" class="slide level2">
+<h2>Clinical characterization &amp; survival analysis</h2>
 <ul>
-<li><p>Clinical characterization &amp; survival analysis between those subgroups</p></li>
-<li><p>Cox proportional hazard regression</p></li>
+<li>Compare clinical characteristics between subgroups.</li>
+<li>Kaplan–Meier curves and log-rank test for overall survival.</li>
+<li>Adjusted Cox proportional hazards regression.</li>
 </ul>
 </section>
 <section id="exploratory-analysis" class="slide level2">

@@ -1,5 +1,5 @@
 ---
-title: "Proporsal"
+title: "Proposal"
 author: "Nguyen The Nguyen PHAM"
 format:
   revealjs:
@@ -26,61 +26,76 @@ Difference in biology may create differences in clinical characteristics and pro
 
 ## Gene expression
 
-- If treat DNA as the factory
+- **DNA**: The blueprint of the factory.
 
-- Gene is the guildance
+- **Gene**: A specific instruction within the blueprint.
 
-- Expression is the level of using this guildance (gene) to generate the product (protein)
+- **Gene expression**: The process of using a gene's instructions to produce a functional product, such as a protein.
 
-## Cancer pathway
+- **Gene expression level**: How much a gene is expressed, reflecting the amount of its product produced (in the case of protein-coding genes).
 
-- A pathway (biological pathway) is a series or network of biological activities in which multiple genes or proteins participate to carry out a specific function within a cell.
+**Gene expression reflects how actively a gene is being used to produce its functional product.**
 
-## Cancer pathway
+Higher gene expression generally indicates greater production of the gene's RNA, and potentially its protein product.
 
-- Some pathways in breast cancer
+## Biological pathway
 
-  - Estrogen / hormone signaling: how cells respond to hormones.
-  
-  - PI3K–AKT–mTOR signaling: how cells receive and transmit signals for growth/survival.
-  
-  - Cell cycle / proliferation: how rapidly or slowly cells divide. 
-  
-  - DNA repair: how cells repair damaged DNA.
+- A biological pathway is a network of interconnected biological processes involving multiple genes and proteins that work together to perform specific functions within a cell.
+
+- These pathways regulate essential cellular activities, such as cell growth, survival, division, and response to external signals.
+
+## Breast cancer-related pathways
+
+Some key biological pathways involved in breast cancer:
+
+- **Estrogen / hormone signaling:** Regulates cellular responses to hormones, influencing breast cancer growth and development.
+
+- **PI3K–AKT–mTOR signaling:** Regulates cell growth, survival, metabolism, and proliferation.
+
+- **Cell cycle / proliferation:** Controls cell division and regulates how cells grow and multiply.
+
+- **DNA repair:** Detects and repairs DNA damage to maintain genomic stability.
 
 ## Research question
 
-Do breast cancer **subgroups** identified through pathway-informed gene expression **clustering** differ in clinical characteristics and overall survival?
+**Do breast cancer subgroups identified through pathway-informed gene expression clustering differ in clinical characteristics and overall survival (OS)?**
 
 ## Data
 
-[METABRIC data](https://www.kaggle.com/datasets/raghadalharbi/breast-cancer-gene-expression-profiles-metabric/data){target="_blank"} include:
+**METABRIC dataset**
 
-  - Clinical variables
-  
-  - m-RNA levels z-score (gene expression)
-  
-  - genes mutations
+A cohort of 1,904 patients with breast cancer, including:
 
-for 1904 patients breast cancer patient
+- **Clinical data:** Patient demographics, tumor characteristics, treatment information, and survival outcomes
+- **Gene expression data:** mRNA expression levels represented as z-scores
+- **Mutation data:** Genetic mutation profiles
 
-## Methodology for preliminary analysis
+Source: [METABRIC dataset – Kaggle](https://www.kaggle.com/datasets/raghadalharbi/breast-cancer-gene-expression-profiles-metabric){target="_blank"} 
 
-- Biological pathway selection
+## Preliminary analytical workflow
 
-- Gene mapping
+1. **Biological pathway selection**  
+   Select breast cancer-related pathways based on biological knowledge and literature.
 
-- Coverage assessment 
+2. **Gene-to-pathway mapping**  
+   Map the 489 genes available in METABRIC to the selected pathways.
 
-- Pathway scoring & patient clustering
+3. **Pathway coverage assessment**  
+   Evaluate the number and proportion of pathway genes represented in the dataset.
+   
+## Preliminary analytical workflow   
 
-- Unsupervised clustering to create 2 subgroups
+4. **Pathway scoring**  
+   Calculate pathway-level gene expression scores for each patient.
 
-## Survival analysis
+5. **Patient clustering**  
+   Apply unsupervised clustering to identify two patient subgroups based on pathway-level expression profiles.
 
-- Clinical characterization & survival analysis between those subgroups
+## Clinical characterization & survival analysis
 
-- Cox proportional hazard regression
+- Compare clinical characteristics between subgroups.
+- Kaplan–Meier curves and log-rank test for overall survival.
+- Adjusted Cox proportional hazards regression.
 
 ## Exploratory analysis
 
