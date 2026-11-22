@@ -1,8 +1,9 @@
 ---
 title: "Proporsal"
 author: "Nguyen The Nguyen PHAM"
-output-dir: docs
-format: revealjs
+format:
+  revealjs:
+    embed-resources: true
 ---
 
 ## Background

@@ -1,13 +1,14 @@
 project:
   type: book
   output-dir: docs
+  resources:
+    - slides.html
 
 book:
   title: "Term project of Survival Analysis course"
   author: "Nguyen The Nguyen PHAM"
   chapters:
     - index.qmd
-    # - intro.qmd
     # - summary.qmd
     # - references.qmd
 
