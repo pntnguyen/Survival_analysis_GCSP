@@ -2,7 +2,6 @@
 
 [Proposal slide](slide.html){target="_blank"}
 
-
 # Data pre-processing
 
 ## Package
@@ -88,18 +87,18 @@ df |>
   select(1:10) |>
   skim()
 ```
- 
+
 ## Biological pathway selection
 
 4 biological pathways:
 
-  - Estrogen / hormone signaling
-  
-  - PI3K–AKT–mTOR signaling
-  
-  - Cell cycle / proliferation
-  
-  - DNA repair
+- Estrogen / hormone signaling
+
+- PI3K–AKT–mTOR signaling
+
+- Cell cycle / proliferation
+
+- DNA repair
 
 ```{r}
 #| code-fold: show
@@ -244,14 +243,12 @@ df_clust |>
 
 ```
 
-
-::: {.callout-note}
+::: callout-note
 We clustered 2 groups:
 
-  - Group 1: Lower cell cycle, higher hormone signaling, lower PI3K-AKT-mTOR signaling pathway score
-  
-  - Group 2: Higher cell cycle, lower hormone signaling, higher PI3K-AKT-mTOR signaling pathway score
+- Group 1: Lower cell cycle, higher hormone signaling, lower PI3K-AKT-mTOR signaling pathway score
 
+- Group 2: Higher cell cycle, lower hormone signaling, higher PI3K-AKT-mTOR signaling pathway score
 :::
 
 ## KM-curve
@@ -312,6 +309,7 @@ df_clust %<>%
     )
   )
 ```
+
 ## Age at diagnosis
 
 ```{r}
@@ -363,8 +361,6 @@ df_clust |>
 
 ## Nottingham prognostic index
 
-
-
 ```{r}
 df_clust |>
   filter(!is.na(cluster_k2), !is.na(npi_cat)) |>
@@ -382,4 +378,3 @@ df_clust |>
   theme_bw() +
   theme(axis.text.x = element_text(angle = 30, hjust = 1))
 ```
-

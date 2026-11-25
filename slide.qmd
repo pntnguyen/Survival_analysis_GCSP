@@ -12,15 +12,15 @@ Breast cancer is biologically heterogeneous.
 
 Breast Cancer patients may differ in:
 
-  - Hormone-related signaling
-  
-  - Tumor growth and proliferation
-  
-  - DNA repair mechanisms
-  
-  - Cellular signaling pathways
-  
-  - Immune-related activity
+- Hormone-related signaling
+
+- Tumor growth and proliferation
+
+- DNA repair mechanisms
+
+- Cellular signaling pathways
+
+- Immune-related activity
 
 Difference in biology may create differences in clinical characteristics and prognosis.
 
@@ -33,6 +33,8 @@ Difference in biology may create differences in clinical characteristics and pro
 - **Gene expression**: The process of using a gene's instructions to produce a functional product, such as a protein.
 
 - **Gene expression level**: How much a gene is expressed, reflecting the amount of its product produced (in the case of protein-coding genes).
+
+## Gene expression
 
 **Gene expression reflects how actively a gene is being used to produce its functional product.**
 
@@ -70,26 +72,26 @@ A cohort of 1,904 patients with breast cancer, including:
 - **Gene expression data:** mRNA expression levels represented as z-scores
 - **Mutation data:** Genetic mutation profiles
 
-Source: [METABRIC dataset – Kaggle](https://www.kaggle.com/datasets/raghadalharbi/breast-cancer-gene-expression-profiles-metabric){target="_blank"} 
+Source: [METABRIC dataset – Kaggle](https://www.kaggle.com/datasets/raghadalharbi/breast-cancer-gene-expression-profiles-metabric){target="_blank"}
 
 ## Preliminary analytical workflow
 
-1. **Biological pathway selection**  
-   Select breast cancer-related pathways based on biological knowledge and literature.
+1.  **Biological pathway selection**\
+    Select breast cancer-related pathways based on biological knowledge and literature.
 
-2. **Gene-to-pathway mapping**  
-   Map the 489 genes available in METABRIC to the selected pathways.
+2.  **Gene-to-pathway mapping**\
+    Map the 489 genes available in METABRIC to the selected pathways.
 
-3. **Pathway coverage assessment**  
-   Evaluate the number and proportion of pathway genes represented in the dataset.
-   
-## Preliminary analytical workflow   
+3.  **Pathway coverage assessment**\
+    Evaluate the number and proportion of pathway genes represented in the dataset.
 
-4. **Pathway scoring**  
-   Calculate pathway-level gene expression scores for each patient.
+## Preliminary analytical workflow
 
-5. **Patient clustering**  
-   Apply unsupervised clustering to identify two patient subgroups based on pathway-level expression profiles.
+4.  **Pathway scoring**\
+    Calculate pathway-level gene expression scores for each patient.
+
+5.  **Patient clustering**\
+    Apply unsupervised clustering to identify two patient subgroups based on pathway-level expression profiles.
 
 ## Clinical characterization & survival analysis
 
@@ -99,14 +101,4 @@ Source: [METABRIC dataset – Kaggle](https://www.kaggle.com/datasets/raghadalha
 
 ## Exploratory analysis
 
-
-
-
-
-
-
-
-
-
-
-
+ [https://pntnguyen.github.io/Survival_analysis_GCSP/](https://pntnguyen.github.io/Survival_analysis_GCSP/){target="_blank"}
