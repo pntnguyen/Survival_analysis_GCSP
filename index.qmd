@@ -19,7 +19,8 @@ required <- c("readr",
               "survival",
               "ggsurvfit",
               "ggplot2",
-              "gtsummary")
+              "gtsummary",
+              "plotly")
 ```
 
 Installing those that are not installed yet:
@@ -229,7 +230,42 @@ score_df <- score_df |>
 df_clust <- df_full |>
   mutate(patient_row = row_number()) |>
   left_join(score_df |> select(patient_row, cluster_k2), by = "patient_row")
+```
 
+Clustering result
+
+```{r}
+df_plot <- df_clust |>
+  filter(!is.na(cluster_k2)) |>
+  select(patient_id, cluster_k2, score_hormone, score_cell_cycle, score_pi3k_akt)
+
+plot_ly(
+  data = df_plot,
+  x = ~score_hormone,
+  y = ~score_cell_cycle,
+  z = ~score_pi3k_akt,
+  color = ~cluster_k2,
+  colors = c("#1b9e77", "#d95f02", "#7570b3"),
+  type = "scatter3d",
+  mode = "markers",
+  marker = list(size = 3, opacity = 0.7),
+  text = ~paste("Patient:", patient_id),
+  hoverinfo = "text+x+y+z"
+) |>
+  layout(
+    scene = list(
+      xaxis = list(title = "Hormone score"),
+      yaxis = list(title = "Cell cycle score"),
+      zaxis = list(title = "PI3K-AKT score")
+    ),
+    legend = list(title = list(text = "Cluster"))
+  )
+```
+
+
+Visualization profile
+
+```{r}
 # Visual profile
 df_clust |>
   filter(!is.na(cluster_k2)) |>
@@ -240,8 +276,8 @@ df_clust |>
   facet_wrap(~pathway) +
   theme_bw() +
   theme(legend.position = "none")
-
 ```
+
 
 ::: callout-note
 We clustered 2 groups:
